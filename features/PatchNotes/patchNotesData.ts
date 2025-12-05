@@ -6,6 +6,19 @@ export interface PatchNote {
 
 export const patchNotesData: PatchNote[] = [
   {
+    version: '0.1.9',
+    date: 'December 5, 2025',
+    changes: [
+      'Smart Learning System: The app now remembers which characters you struggle with and shows them more often',
+      'Your accuracy on each character is saved and used to personalize your training',
+      'Click vocabulary words to open their Jisho dictionary entries in a new tab',
+      'Added quick Hanabira link in the desktop bottom bar',
+      'Improved progress tracking with GitHub-style calendar grid',
+      'BackToTop button now stays in the top-right corner on all devices',
+      'Security Update: Fixed critical Next.js vulnerability'
+    ]
+  },
+  {
     version: '0.1.8',
     date: 'December 4, 2025',
     changes: [

@@ -17,7 +17,7 @@ import usePreferencesStore from '@/features/Preferences/store/usePreferencesStor
 import useCrazyModeStore from '@/features/CrazyMode/store/useCrazyModeStore';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 
-const APP_VERSION = '0.1.8 (alpha)';
+const APP_VERSION = '0.1.9 (alpha)';
 
 type SocialLink = {
   icon: IconDefinition | LucideIcon;
