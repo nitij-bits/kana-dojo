@@ -26,7 +26,7 @@ Claude Code has automatic approval for:
   - `git stash` - Stash changes
   - `git fetch` - Fetch from remote
   - `git pull` - Pull from remote
-- **File operations**:
+- **File operations (Bash)**:
   - `dir` - List directory contents (Windows)
   - `ls` - List directory contents (Unix)
   - `cat` - Display file contents
@@ -34,6 +34,21 @@ Claude Code has automatic approval for:
   - `echo` - Print text
   - `find` - Find files
   - `grep` - Search text
+  - `sed` - Stream editor for text manipulation
+  - `awk` - Pattern scanning and processing
+  - `head` - Output first part of files
+  - `tail` - Output last part of files
+  - `mkdir` - Create directories
+  - `cp` - Copy files and directories
+  - `mv` - Move/rename files and directories
+- **File editing tools**:
+  - `Read` - Read file contents
+  - `Write` - Create or overwrite files
+  - `Edit` - Make precise edits to existing files
+  - `NotebookEdit` - Edit Jupyter notebook cells
+  - `Glob` - Find files by pattern matching
+  - `Grep` - Search file contents with regex
+  - `TodoWrite` - Manage task lists
 
 ### Denied Commands (Safety)
 

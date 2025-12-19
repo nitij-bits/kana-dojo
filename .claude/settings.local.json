@@ -2,26 +2,14 @@
   "permissions": {
     "defaultMode": "dontAsk",
     "allow": [
-      "Bash(cmd /c:*)",
-      "Bash(npm:*)",
-      "Bash(npx:*)",
-      "Bash(git status:*)",
-      "Bash(git diff:*)",
-      "Bash(git log:*)",
-      "Bash(git show:*)",
-      "Bash(git branch:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git stash:*)",
-      "Bash(git fetch:*)",
-      "Bash(git pull:*)",
-      "Bash(dir:*)",
-      "Bash(ls:*)",
-      "Bash(cat:*)",
-      "Bash(pwd:*)",
-      "Bash(echo:*)",
-      "Bash(find:*)",
-      "Bash(grep:*)"
+      "Bash",
+      "Read",
+      "Write",
+      "Edit",
+      "NotebookEdit",
+      "Glob",
+      "Grep",
+      "TodoWrite"
     ],
     "deny": [
       "Bash(git push --force:*)",
@@ -29,6 +17,7 @@
       "Bash(git reset --hard:*)",
       "Bash(git clean -fd:*)",
       "Bash(rm -rf:*)",
+      "Bash(rm -r:*)",
       "Bash(del /s:*)",
       "Bash(rmdir /s:*)",
       "Bash(format:*)"

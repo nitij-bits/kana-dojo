@@ -248,13 +248,13 @@ const baseThemeSets: BaseThemeGroup[] = [
       },
       {
         id: 'nord',
-        backgroundColor: 'oklch(33.81% 0.0237 264.19 / 1)',
+        backgroundColor: 'oklch(30.81% 0.0237 264.19 / 1)',
         mainColor: 'oklch(77.09% 0.0747 130.82 / 1)',
         secondaryColor: 'oklch(72.67% 0.0638 335.82 / 1)'
       },
       {
         id: 'yukata',
-        backgroundColor: 'oklch(20.83% 0.0367 263.24 / 1)',
+        backgroundColor: 'oklch(18.83% 0.0367 263.24 / 1)',
         mainColor: 'oklch(65.16% 0.1943 14.70 / 1)',
         secondaryColor: 'oklch(68.92% 0.1657 313.51 / 1)'
       },

@@ -6,15 +6,9 @@ This file provides comprehensive guidance to AI coding assistants (GitHub Copilo
 
 ## ⚠️ IMPORTANT: Command Execution for AI Agents
 
-**When executing shell commands, ALWAYS prefix them with `cmd /c`.**
+**For Windows environments, prefix shell commands with `cmd /c`. For Linux/Unix environments (WSL, Linux, macOS), run commands directly.**
 
-Running commands directly doesn't work properly for AI agents on this Windows system. Always use:
-
-```bash
-cmd /c <your-command>
-```
-
-**Examples:**
+**Examples (Windows):**
 
 ```bash
 cmd /c npm run lint
@@ -22,16 +16,36 @@ cmd /c npm run build
 cmd /c npm run test
 ```
 
+**Examples (Linux/Unix/WSL):**
+
+```bash
+npm run lint
+npm run build
+npm run test
+```
+
 ### Claude Code Permissions
 
-Claude Code has been configured with automatic approval for common development commands. See `.claude/README.md` for full details. Approved commands include:
+Claude Code has been configured with automatic approval for common development commands and file operations. See `.claude/README.md` for full details. Approved commands include:
 
+**Bash Commands:**
 - ✅ All npm and npx commands
-- ✅ Safe git commands (status, diff, log, add, commit, pull)
-- ✅ File operations (dir, ls, cat, find, grep)
+- ✅ Safe git commands (status, diff, log, add, commit, pull, stash, fetch)
+- ✅ File operations (ls, cat, find, grep, sed, awk, head, tail, mkdir, cp, mv)
+- ✅ All cmd /c commands (Windows)
+
+**File Editing Tools:**
+- ✅ Read - Read file contents
+- ✅ Write - Create or overwrite files
+- ✅ Edit - Make precise edits to existing files
+- ✅ Glob - Find files by pattern matching
+- ✅ Grep - Search file contents with regex
+- ✅ TodoWrite - Manage task lists
+
+**Safety:**
 - ❌ Destructive operations are blocked (force push, hard reset, recursive delete)
 
-This means Claude Code can run verification, testing, and most development commands without asking for approval each time.
+This means Claude Code can run verification, testing, file editing, and most development commands without asking for approval each time.
 
 ---
 
@@ -713,5 +727,5 @@ export type { TypeName } from './types';
 
 ---
 
-**Last Updated**: December 18, 2024
+**Last Updated**: December 19, 2024
 **Version**: 0.1.11
