@@ -115,7 +115,9 @@ describe('Property 9: Metadata Contains Required Fields', () => {
     fc.assert(
       fc.property(blogPostMetaArb, (post: BlogPostMeta) => {
         const metadata = generateBlogMetadata(post, { baseUrl: BASE_URL });
-        expect(metadata.openGraph?.type).toBe('article');
+        // Type assertion needed because OpenGraph is a union type
+        // At runtime, we know this is OpenGraphArticle with type: 'article'
+        expect((metadata.openGraph as { type?: string })?.type).toBe('article');
       }),
       { numRuns: 100 }
     );

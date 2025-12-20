@@ -49,7 +49,11 @@ interface GoogleTranslateResponse {
 type KuroshiroInstance = {
   convert: (
     text: string,
-    options: { to: string; mode: string; romajiSystem: string }
+    options: {
+      to: 'hiragana' | 'katakana' | 'romaji';
+      mode?: 'normal' | 'spaced' | 'okurigana' | 'furigana';
+      romajiSystem?: 'nippon' | 'passport' | 'hepburn';
+    }
   ) => Promise<string>;
 };
 
@@ -82,9 +86,10 @@ async function getKuroshiro(): Promise<KuroshiroInstance> {
     const kuroshiro = new Kuroshiro();
     const analyzer = new KuromojiAnalyzer();
     await kuroshiro.init(analyzer);
-    kuroshiroInstance = kuroshiro;
+    // Type assertion: kuroshiro is a JS library without types, but matches our interface
+    kuroshiroInstance = kuroshiro as KuroshiroInstance;
     kuroshiroInitPromise = null;
-    return kuroshiro;
+    return kuroshiro as KuroshiroInstance;
   })();
 
   return kuroshiroInitPromise;
