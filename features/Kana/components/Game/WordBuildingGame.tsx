@@ -51,15 +51,20 @@ const Tile = memo(({ id, char, onClick, isDisabled, isBlank }: TileProps) => {
   // Blank placeholder tile (invisible but takes space)
   if (isBlank) {
     return (
-      <div
+      <motion.div
+        layoutId={`blank-${id}`}
         className={clsx(
           'relative flex items-center justify-center rounded-xl px-3 py-1.5 text-2xl font-medium sm:px-4 sm:py-2 sm:text-3xl',
           'border-b-4 border-transparent bg-[var(--border-color)]/30',
           'select-none'
         )}
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15 }}
       >
         <span className='opacity-0'>{char}</span>
-      </div>
+      </motion.div>
     );
   }
 
@@ -162,6 +167,8 @@ const WordBuildingGame = ({
 
   const [feedback, setFeedback] = useState(<>{'Build the word!'}</>);
   const [bottomBarState, setBottomBarState] = useState<BottomBarState>('check');
+  // Track tiles that are animating back (to delay blank removal)
+  const [animatingTiles, setAnimatingTiles] = useState<Set<string>>(new Set());
 
   // Generate a word (array of characters) and distractors
   const generateWord = useCallback(() => {
@@ -225,6 +232,7 @@ const WordBuildingGame = ({
     setPlacedTiles([]);
     setIsChecking(false);
     setBottomBarState('check');
+    setAnimatingTiles(new Set());
     setFeedback(<>{'Build the word!'}</>);
   }, [generateWord]);
 
@@ -248,16 +256,16 @@ const WordBuildingGame = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Handle Check button - validates the answer
+  // Handle Check button - validates the answer (user can check anytime with any number of tiles)
   const handleCheck = useCallback(() => {
-    if (placedTiles.length !== wordData.wordChars.length) return;
+    if (placedTiles.length === 0) return;
 
     playClick();
     setIsChecking(true);
 
-    const isCorrect = placedTiles.every(
-      (tile, i) => tile === wordData.answerChars[i]
-    );
+    const isCorrect =
+      placedTiles.length === wordData.answerChars.length &&
+      placedTiles.every((tile, i) => tile === wordData.answerChars[i]);
 
     if (isCorrect) {
       playCorrect();
@@ -307,7 +315,7 @@ const WordBuildingGame = ({
 
       setFeedback(
         <>
-          <span>Correct: {wordData.answerChars.join('')}</span>
+          <span>Wrong! Correct: {wordData.answerChars.join('')}</span>
           <CircleX className='ml-2 inline text-[var(--main-color)]' />
         </>
       );
@@ -343,18 +351,30 @@ const WordBuildingGame = ({
     resetGame();
   }, [playClick, bottomBarState, onCorrect, wordData.wordChars, resetGame]);
 
-  // Handle tile click - either place or remove
+  // Handle tile click - add or remove
   const handleTileClick = useCallback(
     (char: string) => {
       if (isChecking) return;
 
       if (placedTiles.includes(char)) {
+        // Remove from placed tiles - mark as animating first
+        setAnimatingTiles(prev => new Set(prev).add(char));
         setPlacedTiles(prev => prev.filter(c => c !== char));
-      } else if (placedTiles.length < wordData.wordChars.length) {
+
+        // Remove from animating after animation completes
+        setTimeout(() => {
+          setAnimatingTiles(prev => {
+            const next = new Set(prev);
+            next.delete(char);
+            return next;
+          });
+        }, 300);
+      } else {
+        // Add to placed tiles
         setPlacedTiles(prev => [...prev, char]);
       }
     },
-    [isChecking, placedTiles, wordData.wordChars.length]
+    [isChecking, placedTiles]
   );
 
   // Not enough characters for word building
@@ -362,8 +382,7 @@ const WordBuildingGame = ({
     return null;
   }
 
-  const canCheck =
-    placedTiles.length === wordData.wordChars.length && !isChecking;
+  const canCheck = placedTiles.length > 0 && !isChecking;
   const showContinue =
     bottomBarState === 'correct' || bottomBarState === 'wrong';
 
@@ -388,11 +407,11 @@ const WordBuildingGame = ({
         </motion.p>
       </div>
 
-      {/* Answer Row Area - bordered section like Duolingo */}
+      {/* Answer Row Area - bottom border only, reduced padding */}
       <div className='flex w-full flex-col items-center'>
-        <div className='flex h-[4.5rem] w-full items-center border-t-2 border-b-2 border-[var(--border-color)] px-4 sm:w-1/2'>
+        <div className='flex min-h-[4.5rem] w-full items-center border-b border-[var(--border-color)] px-2 sm:w-1/2'>
           <div className='flex flex-row flex-wrap justify-start gap-3'>
-            <AnimatePresence mode='popLayout'>
+            <AnimatePresence mode='sync'>
               {placedTiles.map((char, index) => (
                 <Tile
                   key={`placed-${index}-${char}`}
@@ -407,61 +426,83 @@ const WordBuildingGame = ({
         </div>
       </div>
 
-      {/* Available Tiles - blank placeholders stay in place */}
+      {/* Available Tiles - blank placeholders stay until animation completes */}
       <div className='flex flex-row flex-wrap justify-center gap-3 sm:gap-4'>
-        {wordData.allTiles.map((char, index) => {
-          const isPlaced = placedTiles.includes(char);
-          return (
-            <Tile
-              key={`option-${char}-${index}`}
-              id={`tile-${char}`}
-              char={char}
-              onClick={() => handleTileClick(char)}
-              isDisabled={isChecking}
-              isBlank={isPlaced}
-            />
-          );
-        })}
+        <AnimatePresence mode='sync'>
+          {wordData.allTiles.map((char, index) => {
+            const isPlaced = placedTiles.includes(char);
+            const isAnimatingBack = animatingTiles.has(char);
+            // Show blank if placed OR if animating back
+            const showBlank = isPlaced || isAnimatingBack;
+
+            return (
+              <Tile
+                key={`option-${char}-${index}`}
+                id={`tile-${char}`}
+                char={char}
+                onClick={() => handleTileClick(char)}
+                isDisabled={isChecking}
+                isBlank={showBlank}
+              />
+            );
+          })}
+        </AnimatePresence>
       </div>
 
       <Stars />
 
-      {/* Bottom Bar - Check/Continue button like Duolingo */}
+      {/* Bottom Bar - positioned above the main BottomBar like AnswerSummary */}
       <div
         className={clsx(
-          'fixed bottom-0 left-0 z-10 w-full px-4 py-4',
-          'border-t-2 border-[var(--border-color)]',
-          'flex items-center justify-center',
-          bottomBarState === 'correct' && 'bg-green-500/10',
-          bottomBarState === 'wrong' && 'bg-red-500/10',
-          bottomBarState === 'check' && 'bg-[var(--card-color)]'
+          'w-[100vw]',
+          'border-t-2 border-[var(--border-color)] bg-[var(--card-color)]',
+          'absolute bottom-0 z-10 px-4 py-4 md:bottom-6',
+          'flex flex-col items-center justify-center gap-3'
         )}
       >
-        <div className='flex w-full flex-col items-center gap-3 md:w-1/2'>
-          {/* Feedback text for wrong answers */}
-          {bottomBarState === 'wrong' && (
-            <p className='text-lg font-medium text-red-500'>
-              Correct solution: {wordData.answerChars.join('')}
-            </p>
-          )}
+        {/* Feedback message for correct/wrong - Duolingo style */}
+        {showContinue && (
+          <div className='flex w-full items-center gap-3 md:w-1/2'>
+            {bottomBarState === 'correct' ? (
+              <CircleCheck className='h-10 w-10 text-[var(--main-color)]' />
+            ) : (
+              <CircleX className='h-10 w-10 text-[var(--secondary-color)]' />
+            )}
+            <div className='flex flex-col'>
+              <span
+                className={clsx(
+                  'text-lg font-bold',
+                  bottomBarState === 'correct'
+                    ? 'text-[var(--main-color)]'
+                    : 'text-[var(--secondary-color)]'
+                )}
+              >
+                {bottomBarState === 'correct'
+                  ? 'Nicely done!'
+                  : 'Correct solution:'}
+              </span>
+              <span className='text-sm text-[var(--text-secondary-color)]'>
+                {wordData.answerChars.join('')}
+              </span>
+            </div>
+          </div>
+        )}
 
-          <ActionButton
-            ref={buttonRef}
-            borderBottomThickness={8}
-            borderRadius='3xl'
-            className='w-full py-4 text-xl md:w-full'
-            onClick={showContinue ? handleContinue : handleCheck}
-            disabled={!canCheck && !showContinue}
-            colorScheme={bottomBarState === 'wrong' ? 'secondary' : 'main'}
-          >
-            <span>{showContinue ? 'continue' : 'check'}</span>
-            <CircleArrowRight />
-          </ActionButton>
-        </div>
+        <ActionButton
+          ref={buttonRef}
+          borderBottomThickness={8}
+          borderRadius='3xl'
+          className='w-full py-4 text-xl md:w-1/2'
+          onClick={showContinue ? handleContinue : handleCheck}
+          disabled={!canCheck && !showContinue}
+        >
+          <span>{showContinue ? 'continue' : 'check'}</span>
+          <CircleArrowRight />
+        </ActionButton>
       </div>
 
       {/* Spacer to prevent content being hidden behind fixed bottom bar */}
-      <div className='h-32' />
+      <div className='h-40' />
     </div>
   );
 };
