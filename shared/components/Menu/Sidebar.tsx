@@ -118,7 +118,8 @@ const NavLink = memo(
 
     const baseClasses = clsx(
       'flex items-center gap-2 rounded-2xl transition-all duration-250',
-      'text-2xl max-lg:justify-center max-lg:px-3 max-lg:py-2 lg:w-full lg:px-4 lg:py-2',
+      isMain ? 'text-2xl' : 'text-xl',
+      'max-lg:justify-center max-lg:px-3 max-lg:py-2 lg:w-full lg:px-4 lg:py-2',
       !isMain && 'max-lg:hidden',
     );
 
@@ -186,7 +187,8 @@ const NavLink = memo(
             onClick={onClick}
             className={clsx(
               'relative z-10 flex items-center gap-2 rounded-2xl',
-              'text-2xl max-lg:justify-center max-lg:px-3 lg:w-full lg:px-4',
+              isMain ? 'text-2xl' : 'text-xl',
+              'max-lg:justify-center max-lg:px-3 lg:w-full lg:px-4',
               paddingClasses,
               !isMain && 'max-lg:hidden',
               isActive
@@ -216,7 +218,8 @@ const NavLink = memo(
             borderRadius='xl'
             className={clsx(
               'flex items-center gap-2',
-              'text-2xl max-lg:justify-center max-lg:px-3 max-lg:py-2 lg:w-full lg:px-4 lg:py-2',
+              isMain ? 'text-2xl' : 'text-xl',
+              'max-lg:justify-center max-lg:px-3 max-lg:py-2 lg:w-full lg:px-4 lg:py-2',
               !isMain && 'max-lg:hidden',
             )}
           >
